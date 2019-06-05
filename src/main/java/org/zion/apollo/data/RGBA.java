@@ -1,7 +1,5 @@
 package org.zion.apollo.data;
 
-//import org.zion.apollo.utils.Constants;
-
 import org.zion.apollo.utils.Constants;
 
 public class RGBA {
@@ -10,17 +8,6 @@ public class RGBA {
     private short G;
     private short B;
     private short A;
-
-    public RGBA() {
-
-    }
-
-    public RGBA(RGBA orig) {
-        this.R = orig.R;
-        this.G = orig.G;
-        this.B = orig.B;
-        this.A = orig.A;
-    }
 
     public RGBA(int raw) {
         this.R = (short) (raw & 0xFF);

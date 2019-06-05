@@ -3,7 +3,7 @@ package org.zion.apollo.maps;
 import org.zion.apollo.data.HSV;
 import org.zion.apollo.utils.HSVUtilities;
 
-import java.util.Arrays;
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -20,12 +20,9 @@ public class WeightsMap {
         final int[] frequencies = new int[0x00FFFFFF];
 
         image.getHSVMap().parallelStream().forEach( pix -> frequencies[pix.hashCode()]++ );
-//        for (HSV pixColor : image.getHSVMap()) {
-//            frequencies[pixColor.hashCode()]++;
-//        }
 
 
-        for(int i =0; i< frequencies.length; i++){
+        for(int i =0; i < frequencies.length; i++){
             if(frequencies[i] > 0) {
                 HSV pix = new HSV(i);
                 HSV radix = HSV_UTILITIES.reduceColor(pix);

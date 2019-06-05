@@ -37,7 +37,7 @@ public class HSVUtilities {
                                           (double) e.getKey().getS(),
                                           (double) e.getKey().getV(),
                                           (double) e.getValue()) )
-                .reduce( Arrays.asList(0.0, 0.0, 0.0, 0.0), (acc, el) -> {
+                .reduce( Arrays.asList(0.0, 0.0, 0.0), (acc, el) -> {
                     acc.set(0, acc.get(0) + el.get(0) * el.get(3));
                     acc.set(1, acc.get(1) + el.get(1) * el.get(3));
                     acc.set(2, acc.get(2) + el.get(2) * el.get(3));

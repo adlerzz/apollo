@@ -1,9 +1,7 @@
 package org.zion.apollo.maps;
 
-import org.omg.CORBA.INTERNAL;
 import org.zion.apollo.data.HSV;
 import org.zion.apollo.data.RGBA;
-import org.zion.apollo.utils.HSVUtilities;
 
 import java.awt.image.BufferedImage;
 
@@ -18,7 +16,6 @@ public class Image {
 
     private ArrayList<HSV> hsvMap;
     private boolean loaded;
-    private static final HSVUtilities HSV_UTILITIES = HSVUtilities.getInstance();
 
     private int width;
     private int height;
@@ -35,15 +32,10 @@ public class Image {
             BufferedImage bi = ImageIO.read(is);
             this.width = bi.getWidth();
             this.height = bi.getHeight();
-            //this.hsvMap = new HSV[this.width * this.height];
-            //int k = 0;
+
             int[] map = bi.getRGB(0, 0, this.width, this.height, null, 0, this.width);
 
             this.hsvMap = Arrays.stream(map).parallel().mapToObj(RGBA::new).map(HSV::new).collect(Collectors.toCollection(ArrayList::new));
-
-//            for(int pix: map){
-//                this.hsvMap.add(new HSV(new RGBA(pix)));
-//            }
 
             this.loaded = true;
             long endTime = (new Date()).getTime();
@@ -86,11 +78,6 @@ public class Image {
     public void applyReplacingMap(ReplacingMap replacingMap){
         long startTime = (new Date()).getTime();
         System.out.print("Start applying of the replacing map...");
-
-//        for(HSV pixColor : this.hsvMap) {
-//            HSV newColor = replacingMap.getReducingReplacing(pixColor);
-//            pixColor.setAs(newColor);
-//        }
 
         this.hsvMap.parallelStream().forEach( p -> p.setAs(replacingMap.getReducingReplacing(p)) );
 
