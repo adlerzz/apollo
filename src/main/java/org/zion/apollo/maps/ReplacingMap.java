@@ -2,8 +2,8 @@ package org.zion.apollo.maps;
 
 import org.zion.apollo.data.HSV;
 import org.zion.apollo.utils.HSVUtilities;
+import org.zion.apollo.utils.TimeMeasurements;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,8 +13,8 @@ public class ReplacingMap {
     private static final HSVUtilities HSV_UTILITIES = HSVUtilities.getInstance();
 
     public ReplacingMap(WeightsMap weightsMap) {
-        long startTime = (new Date()).getTime();
-        System.out.print("Creating the map of replacing...");
+        final TimeMeasurements TM = new TimeMeasurements();
+        TM.start(" Creating the map of replacing... ");
 
         this.replacingMap = new HashMap<>();
 
@@ -22,8 +22,7 @@ public class ReplacingMap {
             HSV normalized = HSV_UTILITIES.normalize(weightEl.getValue());
             this.replacingMap.put( weightEl.getKey(), normalized );
         }
-        long endTime = (new Date()).getTime();
-        System.out.println(" Done in " + (endTime - startTime) + " ms");
+        TM.finishAndShowResult();
     }
 
 

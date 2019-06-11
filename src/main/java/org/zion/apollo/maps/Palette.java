@@ -4,6 +4,7 @@ import org.zion.apollo.data.HSV;
 import org.zion.apollo.data.PaletteItem;
 import org.zion.apollo.data.RGBA;
 import org.zion.apollo.utils.HSVUtilities;
+import org.zion.apollo.utils.TimeMeasurements;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -18,16 +19,13 @@ import static org.zion.apollo.utils.Constants.*;
 public class Palette {
     private LinkedList<PaletteItem> palette;
     private static final HSVUtilities HSV_UTILITIES = HSVUtilities.getInstance();
-    //private static final int tileCountX = 15;
-    private static final int tileSize = 40;
-    private static final int transparentTileSize = 8;
-    private static final int transparentColor1 = 0xF0F0F0;
-    private static final int transparentColor2 = 0xA0A0A0;
+    private final TimeMeasurements TM;
+
 
     public Palette(WeightsMap weightsMap, int size /*temporary*/) {
-        long startTime = (new Date()).getTime();
+        TM = new TimeMeasurements();
+        TM.start(" Creating palette... ");
         this.palette = new LinkedList<>();
-        System.out.print("Creating palette...");
 
         for(Map.Entry<HSV, Map<HSV, Integer>> weightEl: weightsMap.getWeightsMap().entrySet()) {
             HSV normalized = HSV_UTILITIES.normalize(weightEl.getValue());
@@ -35,8 +33,7 @@ public class Palette {
 
             this.palette.add( new PaletteItem(normalized, weight) );
         }
-        long endTime = (new Date()).getTime();
-        System.out.println(" Done in " + (endTime - startTime) + " ms");
+        TM.finishAndShowResult();
 
         this.palette.sort(Comparator.comparingLong( (PaletteItem a) -> a.count).reversed());
         this.cutoffRare(size);
@@ -44,7 +41,7 @@ public class Palette {
     }
 
     private void cutoffRare(int size){
-        System.out.print("Cutting off rare colors ...");
+        TM.start("  Cutting off rare colors... ");
         int threshold = (int)( size * MAIN_PART);
         int i = 0;
         while(threshold >= 0 && i < this.palette.size()){
@@ -58,41 +55,39 @@ public class Palette {
                 .collect(Collectors.toList());
         this.palette.clear();
         this.palette.addAll(limited);
-        System.out.println(" Done.");
+        TM.finishAndShowResult();
     }
 
     private void rearrange(){
-        long startTime = (new Date()).getTime();
-        System.out.print("Rearrange tiles...");
+        TM.start("  Rearrange tiles... ");
 
-        List<PaletteItem> blackened = this.palette.stream()
-                .filter( p -> p.color.getV() < (short)0x28)
-                .sorted( Comparator.comparingInt( o -> o.color.getV() ) )
-                .collect(Collectors.toList());
+        final List<PaletteItem> blackened = new ArrayList<>();
+        final List<PaletteItem> grayened = new ArrayList<>();
+        final List<PaletteItem> colorful = new ArrayList<>();
+        this.palette.forEach( p -> {
+            if(p.color.getV() < BLACKENED_V_THRESHOLD){
+                blackened.add(p);
+            } else if(p.color.getV() >= GRAYENED_V_THRESHOLD && p.color.getS() < GRAYENED_S_THRESHOLD) {
+                grayened.add(p);
+            } else {
+                colorful.add(p);
+            }
+        });
 
-        List<PaletteItem> whitened = this.palette.stream()
-                .filter( p -> p.color.getV() >= (short)0xA0 && p.color.getS() < (short)0x30)
-                .sorted( Comparator.comparingInt( o -> o.color.getV() ) )
-                .collect(Collectors.toList());
-
-        List<PaletteItem> colorful = this.palette.stream()
-                .filter( p -> p.color.getV() >= (short)0x28 )
-                .filter( p -> p.color.getV() < (short)0xA0 || p.color.getS() >= (short)0x30 )
-                .sorted( Comparator.comparingInt( o -> o.color.getH() ) )
-                .collect(Collectors.toList());
+        blackened.sort(Comparator.comparingInt( o -> o.color.getV() ));
+        colorful.sort(Comparator.comparingInt( o -> o.color.getH() ));
+        grayened.sort(Comparator.comparingInt( o -> o.color.getV() ));
 
         this.palette.clear();
         this.palette.addAll(blackened);
         this.palette.addAll(colorful);
-        this.palette.addAll(whitened);
-        long endTime = (new Date()).getTime();
-        System.out.println(" Done in " + (endTime - startTime) + " ms");
+        this.palette.addAll(grayened);
+        TM.finishAndShowResult();
     }
 
     public void renderPalette(String fileName) {
-        long startTime = (new Date()).getTime();
+        TM.start(" Save palette to \"" + fileName + "\"... ");
 
-        System.out.print("Save palette to \"" + fileName + "\"...");
 
         final int tileCountX = (int)Math.ceil( Math.sqrt(this.palette.size()*1.0));
         final int tileCountY = (int)Math.ceil( Math.sqrt(this.palette.size()*1.0));
@@ -130,23 +125,10 @@ public class Palette {
                 }
             }
             ImageIO.write(bi, FORMAT_PNG, os);
-            long endTime = (new Date()).getTime();
-            System.out.println(" Done in " + (endTime - startTime) + " ms");
+            TM.finishAndShowResult();
         } catch (IOException ex){
             System.err.println(ex.getLocalizedMessage());
         }
     }
 
-
-    public void showPalette(int size /* temporary*/) {
-        ListIterator<PaletteItem> i = this.palette.listIterator();
-        while( i.hasNext()){
-            int index = i.nextIndex();
-            PaletteItem item = i.next();
-            double percent =  item.count*100.0/(size * MAIN_PART);
-            // double percent =  item.count*100.0/(this.size());
-            System.out.printf("(%03d) %s  \t| %6.3f%%%n", index, item, percent);
-        }
-
-    }
 }

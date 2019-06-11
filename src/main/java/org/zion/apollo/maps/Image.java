@@ -2,6 +2,7 @@ package org.zion.apollo.maps;
 
 import org.zion.apollo.data.HSV;
 import org.zion.apollo.data.RGBA;
+import org.zion.apollo.utils.TimeMeasurements;
 
 import java.awt.image.BufferedImage;
 
@@ -14,6 +15,8 @@ import static org.zion.apollo.utils.Constants.FORMAT_BMP;
 
 public class Image {
 
+    private final TimeMeasurements TM;
+
     private ArrayList<HSV> hsvMap;
     private boolean loaded;
 
@@ -23,11 +26,12 @@ public class Image {
     public Image() {
         this.hsvMap = new ArrayList<>();
         this.loaded = false;
+        this.TM = new TimeMeasurements();
     }
 
     public void loadFromBMP(String fileName) {
-        long startTime = (new Date()).getTime();
-        System.out.print("Loading from file \"" + fileName + "\"...");
+        TM.start(" Loading from file \"" + fileName + "\"... ");
+
         try(InputStream is = new FileInputStream(fileName)) {
             BufferedImage bi = ImageIO.read(is);
             this.width = bi.getWidth();
@@ -38,8 +42,7 @@ public class Image {
             this.hsvMap = Arrays.stream(map).parallel().mapToObj(RGBA::new).map(HSV::new).collect(Collectors.toCollection(ArrayList::new));
 
             this.loaded = true;
-            long endTime = (new Date()).getTime();
-            System.out.println(" Done in " + (endTime - startTime) + " ms");
+            TM.finishAndShowResult();
 
         } catch (IOException ex){
             this.loaded = false;
@@ -48,8 +51,7 @@ public class Image {
     }
 
     public void saveToBMP(String fileName) {
-        long startTime = (new Date()).getTime();
-        System.out.print("Saving to file \"" + fileName + "\"...");
+        TM.start(" Saving to file \"" + fileName + "\"... ");
         try(OutputStream os = new FileOutputStream(fileName)) {
             BufferedImage bi = new BufferedImage(this.width, this.height, BufferedImage.TYPE_INT_RGB);
             int k = 0;
@@ -60,8 +62,7 @@ public class Image {
                 }
             }
             ImageIO.write(bi, FORMAT_BMP, os);
-            long endTime = (new Date()).getTime();
-            System.out.println(" Done in " + (endTime - startTime) + " ms");
+            TM.finishAndShowResult();
         } catch (IOException ex){
             System.err.println(ex.getLocalizedMessage());
         }
@@ -76,13 +77,11 @@ public class Image {
     }
 
     public void applyReplacingMap(ReplacingMap replacingMap){
-        long startTime = (new Date()).getTime();
-        System.out.print("Start applying of the replacing map...");
+        TM.start(" Start applying of the replacing map... ");
 
         this.hsvMap.parallelStream().forEach( p -> p.setAs(replacingMap.getReducingReplacing(p)) );
 
-        long endTime = (new Date()).getTime();
-        System.out.println(" Done in " + (endTime - startTime) + " ms");
+        TM.finishAndShowResult();
     }
 
     public int size() {

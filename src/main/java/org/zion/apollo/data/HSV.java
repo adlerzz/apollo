@@ -1,7 +1,5 @@
 package org.zion.apollo.data;
 
-//import org.zion.apollo.utils.Constants;
-
 import org.zion.apollo.utils.Constants;
 
 public class HSV {
