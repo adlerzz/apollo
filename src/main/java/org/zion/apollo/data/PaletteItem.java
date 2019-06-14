@@ -1,8 +1,8 @@
 package org.zion.apollo.data;
 
 public class PaletteItem {
-    public HSV color;
-    public int count;
+    private HSV color;
+    private int count;
 
 
     public PaletteItem ( HSV color, int count ) {
@@ -10,8 +10,15 @@ public class PaletteItem {
         this.count = count;
     }
 
-    public String toString()
-    {
+    public int getCount(){
+        return this.count;
+    }
+
+    public HSV getColor(){
+        return this.color;
+    }
+
+    public String toString() {
         return String.format ( "PaletteItem{color: %s, count:%d}",
                 this.color.toString (),
                 this.count);

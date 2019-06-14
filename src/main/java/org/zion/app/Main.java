@@ -20,7 +20,7 @@ public class Main {
         TimeMeasurements M = new TimeMeasurements();
         M.start("Start processing at " + (new Date()).toString() + "\n");
 
-        if(!INPUT_IMAGE.getOptValue().isPresent()){
+        if (!INPUT_IMAGE.getOptValue().isPresent()) {
             System.err.println("no input file");
             System.exit(1);
             return;
@@ -30,7 +30,7 @@ public class Main {
         Image image = new Image();
         INPUT_IMAGE.getOptString().ifPresent(image::loadFromBMP);
 
-        if(!image.isLoaded()){
+        if (!image.isLoaded()) {
             System.err.println("no image loaded");
             System.exit(2);
             return;
@@ -40,11 +40,15 @@ public class Main {
         ReplacingMap replacingMap = new ReplacingMap(weightsMap);
         Palette palette = new Palette(weightsMap, image.size());
 
-        image.applyReplacingMap(replacingMap);
+        REDUCED_IMAGE.getOptString().ifPresent(file -> {
+            image.applyReplacingMap(replacingMap);
+            image.saveToBMP(file);
+        });
 
-        REDUCED_IMAGE.getOptString().ifPresent(image::saveToBMP);
 
         PALETTE_IMAGE.getOptString().ifPresent(palette::renderPalette);
+        PIE_DIAGRAM_IMAGE.getOptString().ifPresent(palette::renderPieDiagram);
+
 
         M.finishAndShowResult();
 

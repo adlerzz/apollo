@@ -12,37 +12,40 @@ public enum Param {
     PALETTE_FORMAT("f", "paletteFormat", FORMAT_PNG),
     REDUCED_IMAGE("r", "reducedImage"),
     PALETTE_IMAGE("p", "paletteImage", () -> String.format("%s_palette.%s", INPUT_IMAGE.getValue(), PALETTE_FORMAT.getValue())),
+    PIE_DIAGRAM_IMAGE("d", "pieDiagramImage", () -> String.format("%s_pie.%s", INPUT_IMAGE.getValue(), PALETTE_FORMAT.getValue())),
+    CUT_OFF_THRESHOLD("c", "cutOffThreshold", 0.95),
     TIME_MEASUREMENTS("t", "timeMeasurements", true);
 
     private String shortFlag;
     private String fullFlag;
-    private Object value;
+    private Supplier<Object> value;
     private boolean isBoolean;
 
     Param(String shortFlag, String fullFlag){
         this.shortFlag = shortFlag;
         this.fullFlag = fullFlag;
-        this.value = null;
+        this.value = () -> null;
         this.isBoolean = false;
     }
 
     Param(String shortFlag, String fullFlag, Object defaultValue) {
         this.shortFlag = shortFlag;
         this.fullFlag = fullFlag;
-        this.value = defaultValue;
+        this.value = () -> defaultValue;
         this.isBoolean = false;
     }
     Param(String shortFlag, String fullFlag, boolean isBoolean) {
         this.shortFlag = shortFlag;
         this.fullFlag = fullFlag;
-        this.value = Boolean.FALSE;
+        this.value = () -> Boolean.FALSE;
         this.isBoolean = isBoolean;
     }
 
     Param(String shortFlag, String fullFlag, Supplier<Object> defaultValueFactory) {
         this.shortFlag = shortFlag;
         this.fullFlag = fullFlag;
-        this.value = defaultValueFactory.get();
+        this.value = defaultValueFactory;
+        this.isBoolean = false;
     }
 
     public static void parse(String[] args){
@@ -60,7 +63,14 @@ public enum Param {
                 } else {
                     if (i + 1 < args.length) {
                         String value = args[i + 1];
-                        key.setValue(value);
+
+                        if (key.getValue() instanceof Double) {
+                            key.setValue(Double.parseDouble(value));
+                        } else if(key.getValue() instanceof Integer ) {
+                            key.setValue(Integer.parseInt(value));
+                        }else {
+                            key.setValue(value);
+                        }
                         i++;
                     }
                 }
@@ -78,22 +88,26 @@ public enum Param {
     }
 
     public void setValue(Object value){
-        this.value = value;
+        this.value = () -> value;
     }
 
     public Object getValue(){
-        return value;
+        return value.get();
     }
 
     public Optional<Object> getOptValue(){
-        return Optional.ofNullable(this.value);
+        return Optional.ofNullable(this.value.get());
     }
 
     public Optional<String> getOptString(){
-        return Optional.ofNullable(value).map(Object::toString);
+        return Optional.ofNullable(this.value.get()).map(Object::toString);
     }
 
     public Boolean getBoolean(){
-        return (Boolean) value;
+        return (Boolean) this.value.get();
+    }
+
+    public Double getDouble(){
+        return (Double) this.value.get();
     }
 }

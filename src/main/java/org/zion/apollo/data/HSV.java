@@ -24,7 +24,7 @@ public class HSV {
         this.V = orig.V;
     }
 
-    public static short finite(float value, float min, float max) {
+    private static short finite(double value, double min, double max) {
         short res;
 
         if (value < min) {
@@ -41,52 +41,43 @@ public class HSV {
     }
 
     public HSV(RGBA pix) {
-        float R = (float) (pix.getR() / 255.0);
-        float G = (float) (pix.getG() / 255.0);
-        float B = (float) (pix.getB() / 255.0);
+        double R = pix.getR() / 255.0;
+        double G = pix.getG() / 255.0;
+        double B = pix.getB() / 255.0;
 
-        float Hf, Sf, Vf, MIN, MAX;
+        double Hf, Sf, Vf, MIN, MAX;
 
-        MAX = R;
-        MIN = R;
+        MAX = (R > G) ? R : G ;
+        MIN = (R < G) ? R : G;
 
-        if (MAX < G) {
-            MAX = G;
-        }
-        if (MIN > G) {
-            MIN = G;
-        }
-        if (MAX < B) {
-            MAX = B;
-        }
-        if (MIN > B) {
-            MIN = B;
-        }
+        if (MAX < B) MAX = B;
+        if (MIN > B) MIN = B;
 
         if (MAX - MIN == 0) {
-            Hf = 0;
+            Hf = 0.0;
         } else if (MAX == R) {
             if (G >= B) {
-                Hf = Constants.HEXOYA * ((G - B) / (MAX - MIN));
+                Hf = ((G - B) / (MAX - MIN));
             } else {
-                Hf = Constants.HEXOYA * (6 - ((B - G) / (MAX - MIN)));
+                Hf = (6 - ((B - G) / (MAX - MIN)));
             }
         } else if (MAX == G) {
-            Hf = Constants.HEXOYA * (((B - R) / (MAX - MIN)) + 2);
+            Hf = (((B - R) / (MAX - MIN)) + 2);
         } else {
-            Hf = Constants.HEXOYA * (((R - G) / (MAX - MIN)) + 4);
+            Hf =  (((R - G) / (MAX - MIN)) + 4);
         }
+        Hf *= Constants.HEXOYA;
 
         if (MAX < (1.0 / 255)) {
-            Sf = (float) 0.0;
+            Sf = 0.0;
         } else {
             Sf = (MAX - MIN) / MAX;
         }
         Vf = MAX;
 
         this.H = HSV.finite(Hf, 0, Constants.HEXOYA * 6);
-        this.S = HSV.finite(Sf * 255, 0, 255);
-        this.V = HSV.finite(Vf * 255, 0, 255);
+        this.S = HSV.finite(Sf * 255.0, 0, 255.0);
+        this.V = HSV.finite(Vf * 255.0, 0, 255.0);
 
     }
 

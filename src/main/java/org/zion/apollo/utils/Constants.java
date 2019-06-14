@@ -8,7 +8,6 @@ public interface Constants
 {
     byte HEXOYA = 42;
 
-    double MAIN_PART = 0.95;
     String FORMAT_BMP = "bmp";
     String FORMAT_PNG = "png";
 
@@ -20,8 +19,13 @@ public interface Constants
     short GRAYENED_V_THRESHOLD = 0xA0;
     short GRAYENED_S_THRESHOLD = 0x40;
 
-    int tileSize = 60;
-    int transparentTileSize = 6;
-    int transparentColor1 = 0xF0F0F0;
-    int transparentColor2 = 0xA0A0A0;
+    int TILE_SIZE = 60;
+    int TRANSPARENT_TILE_SIZE = 20;
+    int TRANSPARENT_COLOR_1 = 0xF0F0F0;
+    int TRANSPARENT_COLOR_2 = 0xC0C0C0;
+
+    int PIE_WIDTH = 1000;
+    int PIE_HEIGHT = 1000;
+    int PIE_PADDING = 100;
+    int PIE_RING_WIDTH = 150;
 }
