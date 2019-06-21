@@ -4,6 +4,7 @@ import com.google.common.collect.Iterables;
 import org.adlerzz.apollo.calc.maps.Image;
 import org.adlerzz.apollo.calc.maps.Palette;
 import org.adlerzz.apollo.calc.maps.WeightsMap;
+import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.GetFile;
@@ -48,6 +49,10 @@ public class ApolloBot extends TelegramLongPollingBot {
                     .setChatId(update.getMessage().getChatId())
                     .setPhoto( "photo", new FileInputStream(paletteFile) );
             execute(sender);
+            java.io.File infile = new java.io.File(filename);
+            infile.delete();
+            java.io.File outfile = new java.io.File(paletteFile);
+            outfile.delete();
         } catch (TelegramApiRequestException e) {
             System.err.println( e.getApiResponse() );
             e.printStackTrace();
