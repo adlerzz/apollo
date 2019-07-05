@@ -1,10 +1,11 @@
-package org.adlerzz.apollo.calc.maps;
+package org.adlerzz.apollo.engine.maps;
 
-import org.adlerzz.apollo.calc.singles.HSV;
-import org.adlerzz.apollo.calc.singles.PaletteItem;
-import org.adlerzz.apollo.calc.utils.HSVUtils;
-import org.adlerzz.apollo.calc.utils.RenderUtils;
-import org.adlerzz.apollo.calc.utils.TimeMeasurements;
+import org.adlerzz.apollo.engine.singles.HSV;
+import org.adlerzz.apollo.engine.singles.PaletteItem;
+import org.adlerzz.apollo.engine.utils.HSVUtils;
+import org.adlerzz.apollo.engine.utils.RenderUtils;
+import org.adlerzz.apollo.app.measuretime.MeasureTime;
+import org.springframework.stereotype.Component;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -19,39 +20,36 @@ import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.adlerzz.apollo.app.Param.CUT_OFF_THRESHOLD;
-import static org.adlerzz.apollo.app.Param.PALETTE_FORMAT;
-import static org.adlerzz.apollo.calc.utils.Constants.*;
+import static org.adlerzz.apollo.app.param.Param.CUT_OFF_THRESHOLD;
+import static org.adlerzz.apollo.app.param.Param.PALETTE_FORMAT;
+import static org.adlerzz.apollo.engine.utils.Constants.*;
 
-
+@Component
 public class Palette {
     private LinkedList<PaletteItem> palette;
     private static final HSVUtils HSV_UTILS = HSVUtils.getInstance();
     private static final RenderUtils RENDER_UTILS = RenderUtils.getInstance();
-    private final TimeMeasurements TM;
 
-
-    public Palette(WeightsMap weightsMap, int size /*temporary*/) {
-        TM = new TimeMeasurements();
-        TM.start(" Creating palette... ");
+    public Palette() {
         this.palette = new LinkedList<>();
+    }
 
+    @MeasureTime
+    public void makePalette(WeightsMap weightsMap){
+        this.palette.clear();
         for (Map.Entry<HSV, Map<HSV, Integer>> weightEl : weightsMap.getWeightsMap().entrySet()) {
             HSV normalized = HSV_UTILS.normalize(weightEl.getValue());
             int weight = HSV_UTILS.weight(weightEl.getValue());
 
             this.palette.add(new PaletteItem(normalized, weight));
         }
-        TM.finishAndShowResult();
 
         this.palette.sort(Comparator.comparingLong(PaletteItem::getCount).reversed());
-        this.cutoffRare(size);
-        this.rearrange();
     }
 
-    private void cutoffRare(int size) {
-        double th = (Double) CUT_OFF_THRESHOLD.getValue();
-        TM.start("  Cutting off rare colors... Threshold: " + th * 100 + "%. ");
+    @MeasureTime
+    public void cutoffRare(int size) {
+        double th = CUT_OFF_THRESHOLD.getValue();
 
         int threshold = (int) (size * th);
         int mainAmount = 0;
@@ -72,16 +70,15 @@ public class Palette {
         this.palette.clear();
         this.palette.addAll(limited);
 
-
-        TM.finishAndShowResult();
     }
 
-    private void rearrange() {
-        TM.start("  Rearrange tiles... ");
+    @MeasureTime
+    public void rearrange() {
 
         final List<PaletteItem> blackened = new ArrayList<>();
         final List<PaletteItem> grayened = new ArrayList<>();
         final List<PaletteItem> colorful = new ArrayList<>();
+
         this.palette.forEach(p -> {
             if (p.getColor().getV() < BLACKENED_V_THRESHOLD) {
                 blackened.add(p);
@@ -101,14 +98,13 @@ public class Palette {
         this.palette.addAll(blackened);
         this.palette.addAll(colorful);
         this.palette.addAll(grayened);
-        TM.finishAndShowResult();
+
     }
 
+    @MeasureTime
     public void renderPalette(String fileName) {
-        TM.start(" Save palette to \"" + fileName + "\"... ");
 
         final int tileRowCount = (int) Math.ceil(Math.sqrt(this.palette.size()));
-
 
         try (OutputStream os = new FileOutputStream(fileName)) {
 
@@ -132,17 +128,16 @@ public class Palette {
             }
             g2d.dispose();
 
-            if (PALETTE_FORMAT.getOptString().isPresent()) {
-                ImageIO.write(bi, PALETTE_FORMAT.getOptString().get(), os);
+            if (PALETTE_FORMAT.getOptional().isPresent()) {
+                ImageIO.write(bi, PALETTE_FORMAT.getValue(), os);
             }
-            TM.finishAndShowResult();
         } catch (IOException ex) {
             System.err.println(ex.getLocalizedMessage());
         }
     }
 
+    @MeasureTime
     public void renderPieDiagram(String fileName) {
-        TM.start(" Save pie diagram to \"" + fileName + "\"... ");
 
         final Rectangle2D box = new Rectangle2D.Double(0, 0, PIE_WIDTH, PIE_HEIGHT);
         final Ellipse2D outerRegion = new Ellipse2D.Double(PIE_PADDING, PIE_PADDING, PIE_WIDTH - 2 * PIE_PADDING, PIE_HEIGHT - 2 * PIE_PADDING);
@@ -179,10 +174,9 @@ public class Palette {
 
             g2d.dispose();
 
-            if (PALETTE_FORMAT.getOptString().isPresent()) {
-                ImageIO.write(bi, PALETTE_FORMAT.getOptString().get(), os);
+            if (PALETTE_FORMAT.getOptional().isPresent()) {
+                ImageIO.write(bi, PALETTE_FORMAT.getValue(), os);
             }
-            TM.finishAndShowResult();
 
         } catch (IOException ex) {
             System.err.println(ex.getLocalizedMessage());

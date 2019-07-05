@@ -1,4 +1,4 @@
-package org.adlerzz.apollo.calc.utils;
+package org.adlerzz.apollo.engine.utils;
 
 /**
  *
@@ -7,9 +7,6 @@ package org.adlerzz.apollo.calc.utils;
 public interface Constants
 {
     byte HEXOYA = 42;
-
-    String FORMAT_BMP = "bmp";
-    String FORMAT_PNG = "png";
 
     short H_REDUCE_MASK = 0xE0;
     short S_REDUCE_MASK = 0xE0;

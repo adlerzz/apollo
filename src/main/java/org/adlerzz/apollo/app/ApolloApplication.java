@@ -1,5 +1,7 @@
 package org.adlerzz.apollo.app;
 
+import org.adlerzz.apollo.app.param.Param;
+import org.adlerzz.apollo.app.param.ParamsConfig;
 import org.adlerzz.apollo.bot.ApolloBot;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -16,11 +18,7 @@ public class ApolloApplication implements CommandLineRunner {
 
     private ApolloBot apolloBot;
 
-    @Autowired
-    public void setApolloBot(ApolloBot apolloBot) {
-        this.apolloBot = apolloBot;
-        System.out.println("set bot");
-    }
+    private ParamsConfig paramsConfig;
 
     public static void main(String[] args) {
         ApiContextInitializer.init();
@@ -29,16 +27,24 @@ public class ApolloApplication implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-
-
+        Param.parse(this.paramsConfig);
         TelegramBotsApi botsApi = new TelegramBotsApi();
-        System.out.println(apolloBot);
 
         try {
             botsApi.registerBot(apolloBot);
         } catch (TelegramApiException e) {
             e.printStackTrace();
         }
-        System.out.println("start");
     }
+
+    @Autowired
+    public void setApolloBot(ApolloBot apolloBot) {
+        this.apolloBot = apolloBot;
+    }
+
+    @Autowired
+    public void setParamsConfig(ParamsConfig paramsConfig) {
+        this.paramsConfig = paramsConfig;
+    }
+
 }

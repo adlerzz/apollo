@@ -1,6 +1,6 @@
-package org.adlerzz.apollo.calc.singles;
+package org.adlerzz.apollo.engine.singles;
 
-import org.adlerzz.apollo.calc.utils.Constants;
+import org.adlerzz.apollo.engine.utils.Constants;
 
 public class RGBA {
 

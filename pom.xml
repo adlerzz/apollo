@@ -10,7 +10,7 @@
     </parent>
     <groupId>org.adlerzz</groupId>
     <artifactId>apollo</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <name>apollo</name>
     <description>Which colors has this image? No, I'm serious.</description>
 
@@ -25,14 +25,14 @@
         </dependency>
 
         <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
         </dependency>
 
         <dependency>
@@ -40,6 +40,12 @@
             <artifactId>telegrambots</artifactId>
             <version>4.3.1</version>
         </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-aop</artifactId>
+            <version>5.1.8.RELEASE</version>
+        </dependency>
+
     </dependencies>
 
     <build>

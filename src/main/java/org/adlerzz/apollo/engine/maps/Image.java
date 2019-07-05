@@ -1,8 +1,9 @@
-package org.adlerzz.apollo.calc.maps;
+package org.adlerzz.apollo.engine.maps;
 
-import org.adlerzz.apollo.calc.singles.HSV;
-import org.adlerzz.apollo.calc.singles.RGBA;
-import org.adlerzz.apollo.calc.utils.TimeMeasurements;
+import org.adlerzz.apollo.engine.singles.HSV;
+import org.adlerzz.apollo.engine.singles.RGBA;
+import org.adlerzz.apollo.app.measuretime.MeasureTime;
+import org.springframework.stereotype.Component;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -11,11 +12,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
-import static org.adlerzz.apollo.app.Param.PALETTE_FORMAT;
+import static org.adlerzz.apollo.app.param.Param.PALETTE_FORMAT;
 
+@Component
 public class Image {
-
-    private final TimeMeasurements TM;
 
     private ArrayList<HSV> hsvMap;
     private boolean loaded;
@@ -26,11 +26,12 @@ public class Image {
     public Image() {
         this.hsvMap = new ArrayList<>();
         this.loaded = false;
-        this.TM = new TimeMeasurements();
+
     }
 
-    public void loadFromBMP(String fileName) {
-        TM.start(" Loading from file \"" + fileName + "\"... ");
+    @MeasureTime
+    public void loadFromFile(String fileName) {
+
 
         try(InputStream is = new FileInputStream(fileName)) {
             BufferedImage bi = ImageIO.read(is);
@@ -39,10 +40,13 @@ public class Image {
 
             int[] map = bi.getRGB(0, 0, this.width, this.height, null, 0, this.width);
 
-            this.hsvMap = Arrays.stream(map).parallel().mapToObj(RGBA::new).map(HSV::new).collect(Collectors.toCollection(ArrayList::new));
+            this.hsvMap = Arrays.stream(map)
+                    .parallel()
+                    .mapToObj(RGBA::new)
+                    .map(HSV::new)
+                    .collect(Collectors.toCollection(ArrayList::new));
 
             this.loaded = true;
-            TM.finishAndShowResult();
 
         } catch (IOException ex){
             this.loaded = false;
@@ -50,8 +54,8 @@ public class Image {
         }
     }
 
-    public void saveToBMP(String fileName) {
-        TM.start(" Saving to file \"" + fileName + "\"... ");
+    @MeasureTime
+    public void saveToFile(String fileName) {
         try(OutputStream os = new FileOutputStream(fileName)) {
             BufferedImage bi = new BufferedImage(this.width, this.height, BufferedImage.TYPE_INT_RGB);
             int k = 0;
@@ -61,10 +65,9 @@ public class Image {
                     k++;
                 }
             }
-            if( PALETTE_FORMAT.getOptString().isPresent()) {
-                ImageIO.write(bi, PALETTE_FORMAT.getOptString().get(), os);
+            if( PALETTE_FORMAT.getOptional().isPresent()) {
+                ImageIO.write(bi, PALETTE_FORMAT.getValue(), os);
             }
-            TM.finishAndShowResult();
         } catch (IOException ex){
             System.err.println(ex.getLocalizedMessage());
         }
@@ -78,15 +81,12 @@ public class Image {
         return this.loaded;
     }
 
+    @MeasureTime
     public void applyReplacingMap(ReplacingMap replacingMap){
-        TM.start(" Start applying of the replacing map... ");
-
         this.hsvMap.parallelStream().forEach( p -> p.setAs(replacingMap.getReducingReplacing(p)) );
-
-        TM.finishAndShowResult();
     }
 
-    public int size() {
+    public int getSize() {
         return this.width * this.height;
     }
 }

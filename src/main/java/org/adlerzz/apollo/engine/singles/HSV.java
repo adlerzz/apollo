@@ -1,6 +1,6 @@
-package org.adlerzz.apollo.calc.singles;
+package org.adlerzz.apollo.engine.singles;
 
-import static org.adlerzz.apollo.calc.utils.Constants.HEXOYA;
+import static org.adlerzz.apollo.engine.utils.Constants.HEXOYA;
 
 public class HSV {
     private short H;

@@ -1,15 +1,17 @@
-package org.adlerzz.apollo.calc.utils;
+package org.adlerzz.apollo.engine.utils;
 
-import org.adlerzz.apollo.calc.singles.HSV;
-import org.adlerzz.apollo.calc.singles.RGBA;
+import org.adlerzz.apollo.engine.singles.HSV;
+import org.adlerzz.apollo.engine.singles.RGBA;
+import org.springframework.stereotype.Service;
 
 import java.awt.*;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import static org.adlerzz.apollo.calc.utils.Constants.*;
+import static org.adlerzz.apollo.engine.utils.Constants.*;
 
+@Service
 public class HSVUtils {
 
     private static HSVUtils INSTANCE = null;

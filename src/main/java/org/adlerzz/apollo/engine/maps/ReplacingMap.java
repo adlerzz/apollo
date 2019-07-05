@@ -1,28 +1,30 @@
-package org.adlerzz.apollo.calc.maps;
+package org.adlerzz.apollo.engine.maps;
 
-import org.adlerzz.apollo.calc.singles.HSV;
-import org.adlerzz.apollo.calc.utils.HSVUtils;
-import org.adlerzz.apollo.calc.utils.TimeMeasurements;
+import org.adlerzz.apollo.engine.singles.HSV;
+import org.adlerzz.apollo.engine.utils.HSVUtils;
+import org.adlerzz.apollo.app.measuretime.MeasureTime;
+import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
 
+@Service
 public class ReplacingMap {
 
     private final HashMap<HSV, HSV> replacingMap;
     private static final HSVUtils HSV_UTILS = HSVUtils.getInstance();
 
-    public ReplacingMap(WeightsMap weightsMap) {
-        final TimeMeasurements TM = new TimeMeasurements();
-        TM.start(" Creating the map of replacing... ");
-
+    public ReplacingMap() {
         this.replacingMap = new HashMap<>();
+    }
 
+    @MeasureTime
+    public void makeMap(WeightsMap weightsMap){
+        this.replacingMap.clear();
         for(Map.Entry<HSV, Map<HSV, Integer>> weightEl: weightsMap.getWeightsMap().entrySet()) {
             HSV normalized = HSV_UTILS.normalize(weightEl.getValue());
             this.replacingMap.put( weightEl.getKey(), normalized );
         }
-        TM.finishAndShowResult();
     }
 
 

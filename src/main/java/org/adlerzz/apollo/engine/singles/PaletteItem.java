@@ -1,4 +1,4 @@
-package org.adlerzz.apollo.calc.singles;
+package org.adlerzz.apollo.engine.singles;
 
 public class PaletteItem {
     private HSV color;

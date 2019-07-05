@@ -1,12 +1,14 @@
-package org.adlerzz.apollo.calc.utils;
+package org.adlerzz.apollo.engine.utils;
+
+import org.springframework.stereotype.Service;
 
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 
-import static org.adlerzz.apollo.calc.utils.Constants.*;
+import static org.adlerzz.apollo.engine.utils.Constants.*;
 
-
+@Service
 public class RenderUtils {
     private static RenderUtils INSTANCE = null;
     private static TexturePaint TRANSPARENT_TEXTURE_INSTANCE = null;

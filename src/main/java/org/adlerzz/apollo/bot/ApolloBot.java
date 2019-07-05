@@ -1,78 +1,81 @@
 package org.adlerzz.apollo.bot;
 
-import com.google.common.collect.Iterables;
-import org.adlerzz.apollo.calc.maps.Image;
-import org.adlerzz.apollo.calc.maps.Palette;
-import org.adlerzz.apollo.calc.maps.WeightsMap;
-import org.apache.tomcat.util.http.fileupload.FileUtils;
+import org.adlerzz.apollo.bot.handlers.CommandHandler;
+import org.adlerzz.apollo.bot.handlers.ImageHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
-import org.telegram.telegrambots.meta.api.methods.GetFile;
-import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
-import org.telegram.telegrambots.meta.api.objects.File;
-import org.telegram.telegrambots.meta.api.objects.PhotoSize;
+import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
+import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
+import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.Serializable;
+import java.util.function.Function;
 
-import static org.adlerzz.apollo.app.Param.PALETTE_FORMAT;
+import static org.adlerzz.apollo.app.param.Param.BOT_NAME;
+import static org.adlerzz.apollo.app.param.Param.BOT_TOKEN;
 
 @Service
 public class ApolloBot extends TelegramLongPollingBot {
+    private static final Logger log = LoggerFactory.getLogger(ApolloBot.class);
+
+    private ImageHandler imageHandler;
+    private CommandHandler commandHandler;
 
     public ApolloBot(){
-        System.out.println("creating bot");
+
     }
 
     @Override
     public void onUpdateReceived(Update update) {
-        PhotoSize image = Iterables.getLast(update.getMessage().getPhoto());
-        GetFile getFile = new GetFile().setFileId(image.getFileId());
-        try{
-            File file = execute(getFile);
-            String filename = downloadFile(file).getAbsolutePath();
-            System.out.println(filename);
-            Image img = new Image();
-            img.loadFromBMP(filename);
-
-            WeightsMap weightsMap = new WeightsMap(img);
-            Palette palette = new Palette(weightsMap, img.size());
-
-            String paletteFile = filename + "_palette." + PALETTE_FORMAT.getValue();
-            palette.renderPalette(paletteFile);
-
-
-            SendPhoto sender = new SendPhoto()
-                    .setChatId(update.getMessage().getChatId())
-                    .setPhoto( "photo", new FileInputStream(paletteFile) );
-            execute(sender);
-            java.io.File infile = new java.io.File(filename);
-            infile.delete();
-            java.io.File outfile = new java.io.File(paletteFile);
-            outfile.delete();
-        } catch (TelegramApiRequestException e) {
-            System.err.println( e.getApiResponse() );
-            e.printStackTrace();
-        } catch (TelegramApiException e){
-            System.err.println(e.getLocalizedMessage());
-            e.printStackTrace();
-        } catch (FileNotFoundException e){
-            System.err.println( e.getMessage());
-            e.printStackTrace();
+        log.debug("get message");
+        if(update.hasMessage()) {
+            Message message = update.getMessage();
+            if (update.getMessage().hasPhoto()) {
+                imageHandler.accept(message);
+            }
+            if (update.getMessage().hasText()) {
+                commandHandler.accept(message);
+            }
+        }
+        if(update.hasCallbackQuery()){
+            CallbackQuery callbackQuery = update.getCallbackQuery();
+            commandHandler.react(callbackQuery);
         }
 
     }
 
+//    public <T> Message unifiedExecute(Function<T,Message> method, T arg, Logger log, ){
+//        try{
+//            return method.apply(arg);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        return null;
+//    }
+
     @Override
     public String getBotUsername() {
-        return "ApolloBot";
+        return BOT_NAME.getValue();
     }
 
     @Override
     public String getBotToken() {
-        return "624923142:AAGha-1rrk4_BLo6_dGrdJOWqZ_YK8ajB3c";
+        return BOT_TOKEN.getValue();
     }
+
+    @Autowired
+    public void setImageHandler(ImageHandler imageHandler) {
+        this.imageHandler = imageHandler;
+    }
+
+    @Autowired
+    public void setCommandHandler(CommandHandler commandHandler) {
+        this.commandHandler = commandHandler;
+    }
+
 }

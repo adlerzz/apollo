@@ -1,0 +1,10 @@
+params:
+  map:
+    CUT_OFF_THRESHOLD: 0.95
+    TIME_MEASUREMENT: true
+    PALETTE_FORMAT: png
+    BOT_NAME: ApolloBot
+    BOT_TOKEN: 624923142:AAGha-1rrk4_BLo6_dGrdJOWqZ_YK8ajB3c
+logging:
+  level:
+    org.adlerzz.apollo: DEBUG
