@@ -16,8 +16,10 @@ import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.objects.File;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.PhotoSize;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.io.FileInputStream;
+import java.io.IOException;
 
 import static org.adlerzz.apollo.app.param.Param.PALETTE_FORMAT;
 
@@ -36,40 +38,41 @@ public class ImageHandler extends AbstractHandler{
 
     @MeasureTime
     @Override
-    public void accept(Message message) {
+    public void accept(Message message) throws TelegramApiException {
         PhotoSize image = Iterables.getLast(message.getPhoto());
         GetFile getFile = new GetFile().setFileId(image.getFileId());
-        try{
-            File file = this.getBot().execute(getFile);
-            String filename = this.getBot().downloadFile(file).getAbsolutePath();
-            log.debug("download to {}", filename);
 
-            this.image.loadFromFile(filename);
+        File file = this.getBot().execute(getFile);
+        String filename = this.getBot().downloadFile(file).getAbsolutePath();
+        log.debug("download to {}", filename);
 
-            weightsMap.makeMap(this.image);
+        this.image.loadFromFile(filename);
 
-            palette.makePalette(weightsMap);
-            palette.cutoffRare(this.image.getSize());
-            palette.rearrange();
+        weightsMap.makeMap(this.image);
 
-            String paletteFormat = PALETTE_FORMAT.getValue();
-            String paletteFile = filename + "_palette." + paletteFormat;
-            palette.renderPalette(paletteFile);
+        palette.makePalette(weightsMap);
+        palette.cutoffRare(this.image.getSize());
+        palette.rearrange();
+
+        String paletteFormat = PALETTE_FORMAT.getValue();
+        String paletteFile = filename + "_palette." + paletteFormat;
+        palette.renderPalette(paletteFile);
+
+        try(FileInputStream stream = new FileInputStream(paletteFile)) {
 
             SendPhoto sender = new SendPhoto()
-                    .setChatId(message.getChatId())
-                    .setPhoto( "photo", new FileInputStream(paletteFile) );
+                .setChatId(message.getChatId())
+                .setPhoto( "photo", stream );
             this.getBot().execute(sender);
 
-            if( !cleanup(filename, paletteFile)){
-                log.warn("Temporary files weren't deleted");
-            }
-
-        } catch (Exception e){
+        } catch (IOException e) {
             log.error("Exception thrown: ", e);
-            //e.printStackTrace();
-
         }
+
+        if( !cleanup(filename, paletteFile)){
+            log.warn("Temporary files weren't deleted");
+        }
+
     }
 
     private boolean cleanup(String... files){

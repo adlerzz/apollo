@@ -14,14 +14,16 @@ public enum Param {
     BOT_NAME,
     BOT_TOKEN;
 
-    private Object value = null;
+    private Object value;
     private boolean editable;
 
     Param(){
+        this.value = null;
         this.editable = false;
     }
 
     Param(boolean editable){
+        this.value = null;
         this.editable = editable;
     }
 
@@ -36,8 +38,7 @@ public enum Param {
             String recognized = param.name();
             if(paramsConfig.getMap().containsKey(recognized)) {
                 Object value = paramsConfig.getMap().get(recognized);
-                log.debug("recognized: {}", recognized);
-                log.debug("({}): {}", value.getClass(), value);
+                log.debug("recognized {} variable with value \u001B[35m\"{}\"\u001B[0m as {}", recognized, value, value.getClass());
                 param.setValue(value);
             } else{
                 log.debug("{} not recognized", recognized);

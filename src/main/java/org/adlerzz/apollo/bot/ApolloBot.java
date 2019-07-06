@@ -7,14 +7,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
-import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-
-import java.io.Serializable;
-import java.util.function.Function;
 
 import static org.adlerzz.apollo.app.param.Param.BOT_NAME;
 import static org.adlerzz.apollo.app.param.Param.BOT_TOKEN;
@@ -33,30 +29,26 @@ public class ApolloBot extends TelegramLongPollingBot {
     @Override
     public void onUpdateReceived(Update update) {
         log.debug("get message");
-        if(update.hasMessage()) {
-            Message message = update.getMessage();
-            if (update.getMessage().hasPhoto()) {
-                imageHandler.accept(message);
+        try {
+            if (update.hasMessage()) {
+                Message message = update.getMessage();
+                if (update.getMessage().hasPhoto()) {
+                    imageHandler.accept(message);
+                }
+                if (update.getMessage().hasText()) {
+                    commandHandler.accept(message);
+                }
             }
-            if (update.getMessage().hasText()) {
-                commandHandler.accept(message);
+
+            if(update.hasCallbackQuery()){
+                CallbackQuery callbackQuery = update.getCallbackQuery();
+                commandHandler.react(callbackQuery);
             }
-        }
-        if(update.hasCallbackQuery()){
-            CallbackQuery callbackQuery = update.getCallbackQuery();
-            commandHandler.react(callbackQuery);
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
         }
 
     }
-
-//    public <T> Message unifiedExecute(Function<T,Message> method, T arg, Logger log, ){
-//        try{
-//            return method.apply(arg);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        return null;
-//    }
 
     @Override
     public String getBotUsername() {

@@ -24,7 +24,7 @@ public class CommandHandler extends AbstractHandler{
 
     @MeasureTime
     @Override
-    public void accept(Message message) {
+    public void accept(Message message) throws TelegramApiException{
         log.debug("text: {}", message.getText());
         switch(message.getText()){
             case "/params": {
@@ -35,11 +35,9 @@ public class CommandHandler extends AbstractHandler{
                 SendMessage sender = new SendMessage()
                         .setChatId(message.getChatId())
                         .setText( String.join("\n", params) );
-                try {
-                    getBot().execute(sender);
-                } catch (TelegramApiException e) {
-                    log.error("exception thrown: ", e);
-                }
+
+                getBot().execute(sender);
+
             } break;
 
             case "/setparam": {
@@ -70,18 +68,16 @@ public class CommandHandler extends AbstractHandler{
     }
 
     @MeasureTime
-    public void react(CallbackQuery callback){
+    public void react(CallbackQuery callback) throws TelegramApiException{
         String[] cmds = callback.getData().split(" ", 2);
         if(cmds.length == 2 && "sit".equals(cmds[0]) ){
             Param param = Param.valueOf(cmds[1]);
             SendMessage sender = new SendMessage()
                     .setChatId(callback.getMessage().getChatId())
                     .setText( param.name() + ": " + param.getValue().toString() );
-            try {
-                getBot().execute(sender);
-            } catch (TelegramApiException e) {
-                log.error("exception thrown: ", e);
-            }
+
+             getBot().execute(sender);
+
         }
 
     }

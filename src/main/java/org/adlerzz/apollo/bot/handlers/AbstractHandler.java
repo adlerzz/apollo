@@ -4,6 +4,7 @@ import org.adlerzz.apollo.bot.ApolloBot;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.Message;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 @Service
 public abstract class AbstractHandler {
@@ -18,6 +19,6 @@ public abstract class AbstractHandler {
         this.bot = bot;
     }
 
-    public abstract void accept(Message message);
+    public abstract void accept(Message message) throws TelegramApiException;
 
 }

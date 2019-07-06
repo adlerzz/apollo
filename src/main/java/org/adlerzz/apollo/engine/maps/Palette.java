@@ -63,9 +63,9 @@ public class Palette {
 
         List<PaletteItem> limited = this.palette.stream().limit(mainAmount).collect(Collectors.toList());
 
-        int all = limited.stream().map(PaletteItem::getCount).reduce(0, Integer::sum);
-        int p_threshold = all / 360;
-        limited = limited.stream().filter(p -> p.getCount() > p_threshold).collect(Collectors.toList());
+        // int all = limited.stream().map(PaletteItem::getCount).reduce(0, Integer::sum);
+        // int p_threshold = all / 360;
+        // limited = limited.stream().filter(p -> p.getCount() > p_threshold).collect(Collectors.toList());
 
         this.palette.clear();
         this.palette.addAll(limited);
