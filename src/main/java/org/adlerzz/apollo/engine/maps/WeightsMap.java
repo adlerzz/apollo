@@ -13,7 +13,6 @@ import java.util.Map;
 public class WeightsMap {
     private final HashMap<HSV, Map<HSV, Integer>> weightsMap;
 
-    @Autowired
     private HSVUtils hsvUtils;
 
     public WeightsMap() {
@@ -41,5 +40,10 @@ public class WeightsMap {
 
     public HashMap<HSV, Map<HSV, Integer>> getWeightsMap() {
         return weightsMap;
+    }
+
+    @Autowired
+    public void setHsvUtils(HSVUtils hsvUtils) {
+        this.hsvUtils = hsvUtils;
     }
 }
