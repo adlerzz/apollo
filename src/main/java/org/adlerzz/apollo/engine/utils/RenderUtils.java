@@ -1,6 +1,6 @@
 package org.adlerzz.apollo.engine.utils;
 
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
@@ -8,19 +8,11 @@ import java.awt.image.BufferedImage;
 
 import static org.adlerzz.apollo.engine.utils.Constants.*;
 
-@Service
+@Component
 public class RenderUtils {
-    private static RenderUtils INSTANCE = null;
     private static TexturePaint TRANSPARENT_TEXTURE_INSTANCE = null;
 
-    private RenderUtils(){}
-
-    public static RenderUtils getInstance(){
-        if(INSTANCE == null){
-            INSTANCE = new RenderUtils();
-        }
-        return INSTANCE;
-    }
+    public RenderUtils(){}
 
     public TexturePaint getTransparentTile(){
         if(TRANSPARENT_TEXTURE_INSTANCE == null ) {

@@ -5,7 +5,7 @@ import org.adlerzz.apollo.bot.handlers.ImageHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
@@ -15,7 +15,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import static org.adlerzz.apollo.app.param.Param.BOT_NAME;
 import static org.adlerzz.apollo.app.param.Param.BOT_TOKEN;
 
-@Service
+@Component
 public class ApolloBot extends TelegramLongPollingBot {
     private static final Logger log = LoggerFactory.getLogger(ApolloBot.class);
 
@@ -28,10 +28,11 @@ public class ApolloBot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-        log.debug("get message");
         try {
             if (update.hasMessage()) {
+
                 Message message = update.getMessage();
+                log.debug("get message from {} ({})", message.getChatId(), message.getChat().getUserName());
                 if (update.getMessage().hasPhoto()) {
                     imageHandler.accept(message);
                 }

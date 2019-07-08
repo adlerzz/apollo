@@ -5,6 +5,7 @@ import org.adlerzz.apollo.engine.singles.PaletteItem;
 import org.adlerzz.apollo.engine.utils.HSVUtils;
 import org.adlerzz.apollo.engine.utils.RenderUtils;
 import org.adlerzz.apollo.app.measuretime.MeasureTime;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.imageio.ImageIO;
@@ -27,8 +28,12 @@ import static org.adlerzz.apollo.engine.utils.Constants.*;
 @Component
 public class Palette {
     private LinkedList<PaletteItem> palette;
-    private static final HSVUtils HSV_UTILS = HSVUtils.getInstance();
-    private static final RenderUtils RENDER_UTILS = RenderUtils.getInstance();
+
+    @Autowired
+    private HSVUtils hsvUtils;
+
+    @Autowired
+    private RenderUtils renderUtils;
 
     public Palette() {
         this.palette = new LinkedList<>();
@@ -38,8 +43,8 @@ public class Palette {
     public void makePalette(WeightsMap weightsMap){
         this.palette.clear();
         for (Map.Entry<HSV, Map<HSV, Integer>> weightEl : weightsMap.getWeightsMap().entrySet()) {
-            HSV normalized = HSV_UTILS.normalize(weightEl.getValue());
-            int weight = HSV_UTILS.weight(weightEl.getValue());
+            HSV normalized = hsvUtils.normalize(weightEl.getValue());
+            int weight = hsvUtils.weight(weightEl.getValue());
 
             this.palette.add(new PaletteItem(normalized, weight));
         }
@@ -48,7 +53,8 @@ public class Palette {
     }
 
     @MeasureTime
-    public void cutoffRare(int size) {
+    public void cutoffRare() {
+        int size = this.palette.stream().map(PaletteItem::getCount).reduce(0, Integer::sum);
         double th = CUT_OFF_THRESHOLD.getValue();
 
         int threshold = (int) (size * th);
@@ -117,9 +123,9 @@ public class Palette {
 
                     Paint paint;
                     if(i.hasNext()){
-                        paint = HSV_UTILS.toColor(i.next().getColor());
+                        paint = hsvUtils.toColor(i.next().getColor());
                     } else {
-                        paint = RENDER_UTILS.getTransparentTile();
+                        paint = renderUtils.getTransparentTile();
                     }
 
                     g2d.setPaint(paint);
@@ -154,14 +160,14 @@ public class Palette {
             BufferedImage bi = new BufferedImage(PIE_WIDTH, PIE_HEIGHT, BufferedImage.TYPE_INT_RGB);
 
             Graphics2D g2d = bi.createGraphics();
-            g2d.setPaint(RENDER_UTILS.getTransparentTile());
+            g2d.setPaint(renderUtils.getTransparentTile());
             g2d.fill(box);
 
             double angle = 0;
             for (PaletteItem item : this.palette) {
                 double offset = item.getCount() * 360.0 / all;
 
-                Color color = HSV_UTILS.toColor(item.getColor());
+                Color color = hsvUtils.toColor(item.getColor());
 
                 g2d.setPaint(color);
                 g2d.fill(new Arc2D.Double(outerRegion.getBounds(), angle, offset, Arc2D.PIE));
@@ -169,7 +175,7 @@ public class Palette {
                 angle += offset;
             }
 
-            g2d.setPaint(RENDER_UTILS.getTransparentTile());
+            g2d.setPaint(renderUtils.getTransparentTile());
             g2d.fill(innerRegion);
 
             g2d.dispose();

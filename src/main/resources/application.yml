@@ -1,6 +1,6 @@
 params:
   map:
-    CUT_OFF_THRESHOLD: 0.98
+    CUT_OFF_THRESHOLD: 0.90
     TIME_MEASUREMENT: true
     PALETTE_FORMAT: png
     BOT_NAME: ApolloBot

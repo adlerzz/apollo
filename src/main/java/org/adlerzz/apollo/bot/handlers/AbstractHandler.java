@@ -2,11 +2,11 @@ package org.adlerzz.apollo.bot.handlers;
 
 import org.adlerzz.apollo.bot.ApolloBot;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-@Service
+@Component
 public abstract class AbstractHandler {
     protected ApolloBot bot;
 

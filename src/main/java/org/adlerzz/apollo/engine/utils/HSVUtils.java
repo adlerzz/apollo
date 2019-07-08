@@ -2,7 +2,7 @@ package org.adlerzz.apollo.engine.utils;
 
 import org.adlerzz.apollo.engine.singles.HSV;
 import org.adlerzz.apollo.engine.singles.RGBA;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import java.awt.*;
 import java.util.Arrays;
@@ -11,18 +11,10 @@ import java.util.Map;
 
 import static org.adlerzz.apollo.engine.utils.Constants.*;
 
-@Service
+@Component
 public class HSVUtils {
 
-    private static HSVUtils INSTANCE = null;
-    private HSVUtils(){}
-
-    public static HSVUtils getInstance(){
-        if(INSTANCE == null){
-            INSTANCE = new HSVUtils();
-        }
-        return INSTANCE;
-    }
+    public HSVUtils(){}
 
     public HSV reduceColor(HSV color){
         HSV newColor = new HSV();

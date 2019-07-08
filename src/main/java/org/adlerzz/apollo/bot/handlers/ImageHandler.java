@@ -10,7 +10,7 @@ import org.adlerzz.apollo.app.measuretime.MeasureTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.GetFile;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.objects.File;
@@ -23,7 +23,7 @@ import java.io.IOException;
 
 import static org.adlerzz.apollo.app.param.Param.PALETTE_FORMAT;
 
-@Service
+@Component
 public class ImageHandler extends AbstractHandler{
     private static final Logger log = LoggerFactory.getLogger(ApolloBot.class);
 
@@ -51,7 +51,7 @@ public class ImageHandler extends AbstractHandler{
         weightsMap.makeMap(this.image);
 
         palette.makePalette(weightsMap);
-        palette.cutoffRare(this.image.getSize());
+        palette.cutoffRare();
         palette.rearrange();
 
         String paletteFormat = PALETTE_FORMAT.getValue();
