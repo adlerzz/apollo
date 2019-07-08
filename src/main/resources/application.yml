@@ -8,3 +8,4 @@ params:
 logging:
   level:
     org.adlerzz.apollo: DEBUG
+  file: logs/app.log

@@ -26,6 +26,14 @@ public class CommandHandler extends AbstractHandler{
 
     private KeyboardUtils keyboardUtils;
 
+    private boolean inDialog;
+    private Param handledParam;
+
+    public CommandHandler(){
+        this.inDialog = false;
+        this.handledParam = null;
+    }
+
     @MeasureTime
     @Override
     public void accept(Message message) throws TelegramApiException{
@@ -58,6 +66,20 @@ public class CommandHandler extends AbstractHandler{
 
             default: {
                 log.debug("receive: {}", message.getText());
+
+                if(this.inDialog){
+                    Class paramClass = this.handledParam.getValue().getClass();
+
+                    if( this.handledParam.getValue() instanceof Double){
+                        this.handledParam.setValue( Double.parseDouble (message.getText()) );
+                    } else if( this.handledParam.getValue() instanceof Boolean){
+                        this.handledParam.setValue( Boolean.parseBoolean (message.getText()) );
+                    } else {
+                        this.handledParam.setValue(paramClass.cast(message.getText()));
+                    }
+                    this.inDialog = false;
+                    this.handledParam = null;
+                }
             }
         }
     }
@@ -74,8 +96,11 @@ public class CommandHandler extends AbstractHandler{
                     Param param = Param.valueOf(data);
                     SendMessage sender = new SendMessage()
                             .setChatId(callback.getMessage().getChatId())
-                            .setText( param.name() + ": " + param.getValue().toString() );
+                            .setText( param.name() + ": " + param.getValue().toString() + "\n Enter new value" );
                     getBot().execute(sender);
+
+                    this.inDialog = true;
+                    this.handledParam = param;
                 } break;
 
                 case "cav": {

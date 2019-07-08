@@ -27,7 +27,7 @@ public class WeightsMap {
         image.getHSVMap().parallelStream().forEach( pix -> frequencies[pix.hashCode()]++ );
 
         this.weightsMap.clear();
-        for(int i =0; i < frequencies.length; i++){
+        for(int i = 0; i < frequencies.length; i++){
             if(frequencies[i] > 0) {
                 HSV pix = new HSV(i);
                 HSV radix = hsvUtils.reduceColor(pix);
