@@ -11,6 +11,7 @@ import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
 
 import static org.adlerzz.apollo.app.param.Param.BOT_NAME;
 import static org.adlerzz.apollo.app.param.Param.BOT_TOKEN;
@@ -41,10 +42,12 @@ public class ApolloBot extends TelegramLongPollingBot {
                 }
             }
 
-            if(update.hasCallbackQuery()){
+            if (update.hasCallbackQuery()) {
                 CallbackQuery callbackQuery = update.getCallbackQuery();
                 commandHandler.react(callbackQuery);
             }
+        } catch(TelegramApiRequestException e) {
+            log.error("api response: {}", e.getApiResponse());
         } catch (TelegramApiException e) {
             e.printStackTrace();
         }

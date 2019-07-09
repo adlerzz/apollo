@@ -12,7 +12,8 @@ public enum Param {
     CUT_OFF_THRESHOLD(true),
     TIME_MEASUREMENT(true),
     BOT_NAME,
-    BOT_TOKEN;
+    BOT_TOKEN,
+    PING_URL;
 
     private Object value;
     private boolean editable;

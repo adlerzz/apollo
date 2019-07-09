@@ -3,8 +3,9 @@ params:
     CUT_OFF_THRESHOLD: 0.90
     TIME_MEASUREMENT: true
     PALETTE_FORMAT: png
-    BOT_NAME: ApolloBot
-    BOT_TOKEN: 624923142:AAGha-1rrk4_BLo6_dGrdJOWqZ_YK8ajB3c
+    BOT_NAME: ${BOT_NAME:ApolloBot}
+    BOT_TOKEN: ${BOT_TOKEN:624923142:AAGha-1rrk4_BLo6_dGrdJOWqZ_YK8ajB3c}
+    PING_URL: ${PING_URL:http://0.0.0.0:8080/ping}
 logging:
   level:
     org.adlerzz.apollo: DEBUG
