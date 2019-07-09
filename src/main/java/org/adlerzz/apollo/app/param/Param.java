@@ -6,11 +6,10 @@ import org.slf4j.LoggerFactory;
 import java.util.Optional;
 
 public enum Param {
-    INPUT_IMAGE,
     PALETTE_FORMAT(true),
-    REDUCED_IMAGE,
     CUT_OFF_THRESHOLD(true),
     TIME_MEASUREMENT(true),
+    OUTPUT_VIEW(true),
     BOT_NAME,
     BOT_TOKEN,
     PING_URL;

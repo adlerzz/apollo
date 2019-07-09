@@ -21,6 +21,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import java.io.FileInputStream;
 import java.io.IOException;
 
+import static org.adlerzz.apollo.app.param.Param.OUTPUT_VIEW;
 import static org.adlerzz.apollo.app.param.Param.PALETTE_FORMAT;
 
 @Component
@@ -54,11 +55,34 @@ public class ImageHandler extends AbstractHandler{
         palette.cutoffRare();
         palette.rearrange();
 
-        String paletteFormat = PALETTE_FORMAT.getValue();
-        String paletteFile = filename + "_palette." + paletteFormat;
-        palette.renderPalette(paletteFile);
+        String outputFile;
+        String outputView = OUTPUT_VIEW.getValue();
 
-        try(FileInputStream stream = new FileInputStream(paletteFile)) {
+        switch( outputView ){
+
+
+            case "pie": {
+                String paletteFormat = PALETTE_FORMAT.getValue();
+                outputFile = filename + "_pie." + paletteFormat;
+                palette.renderPieDiagram(outputFile);
+            } break;
+
+            case "reduced": {
+                String paletteFormat = PALETTE_FORMAT.getValue();
+                outputFile = filename + "_reduced." + paletteFormat;
+                replacingMap.makeMap(weightsMap);
+                this.image.applyReplacingMap(this.replacingMap);
+                this.image.saveToFile(outputFile);
+            } break;
+
+            default: {
+                String paletteFormat = PALETTE_FORMAT.getValue();
+                outputFile = filename + "_palette." + paletteFormat;
+                palette.renderPalette(outputFile);
+            }
+        }
+
+        try(FileInputStream stream = new FileInputStream(outputFile)) {
 
             SendPhoto sender = new SendPhoto()
                 .setChatId(message.getChatId())
@@ -69,7 +93,7 @@ public class ImageHandler extends AbstractHandler{
             log.error("Exception thrown: ", e);
         }
 
-        if( !cleanup(filename, paletteFile)){
+        if( !cleanup(filename, outputFile)){
             log.warn("Temporary files weren't deleted");
         }
 
