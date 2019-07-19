@@ -1,9 +1,21 @@
 params:
   map:
-    CUT_OFF_THRESHOLD: 0.90
+    CUT_OFF_THRESHOLD:
+      default: 0.90
+      domain: [0.40, 0.60, 0.75, 0.85, 0.90, 0.95, 0.98, 0.99]
     TIME_MEASUREMENT: true
-    PALETTE_FORMAT: png
-    OUTPUT_VIEW: palette
+    PALETTE_FORMAT:
+      default: png
+      domain:
+        - png
+        - jpeg
+        - bmp
+    OUTPUT_VIEW:
+      default: palette
+      domain:
+        - palette
+        - pie
+        - reduced
     BOT_NAME: ${BOT_NAME:ApolloBot}
     BOT_TOKEN: ${BOT_TOKEN:624923142:AAGha-1rrk4_BLo6_dGrdJOWqZ_YK8ajB3c}
     PING_URL: ${PING_URL:http://0.0.0.0:8080/ping}

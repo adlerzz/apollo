@@ -94,9 +94,15 @@ public class CommandHandler extends AbstractHandler{
             switch (command){
                 case "sit": {
                     Param param = Param.valueOf(data);
+
                     SendMessage sender = new SendMessage()
                             .setChatId(callback.getMessage().getChatId())
-                            .setText( param.name() + ": " + param.getValue().toString() + "\n Enter new value" );
+                            .setText( param.name() + ": " + param.getString() + "\n Enter new value" );
+                    if(param.getDomain() != null && !param.getDomain().isEmpty()){
+                        List<String> domain = param.getDomain();
+                        ReplyKeyboard reply = keyboardUtils.createInlineKeyboardFromCaptionsList(domain, "cav");
+                        sender.setReplyMarkup(reply);
+                    }
                     getBot().execute(sender);
 
                     this.inDialog = true;
@@ -105,6 +111,23 @@ public class CommandHandler extends AbstractHandler{
 
                 case "cav": {
                     log.debug("cav");
+                    if(this.inDialog){
+                        Class paramClass = this.handledParam.getValue().getClass();
+
+                        if( this.handledParam.getValue() instanceof Double){
+                            this.handledParam.setValue( Double.parseDouble (data) );
+                        } else if( this.handledParam.getValue() instanceof Boolean){
+                            this.handledParam.setValue( Boolean.parseBoolean (data) );
+                        } else {
+                            this.handledParam.setValue(paramClass.cast(data));
+                        }
+                        this.inDialog = false;
+                        this.handledParam = null;
+                        SendMessage sender = new SendMessage()
+                                .setChatId(callback.getMessage().getChatId())
+                                .setText("New value assigned");
+                        getBot().execute(sender);
+                    }
                 } break;
 
                 default: {

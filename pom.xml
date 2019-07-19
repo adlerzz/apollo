@@ -10,7 +10,7 @@
     </parent>
     <groupId>org.adlerzz</groupId>
     <artifactId>apollo</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
     <name>apollo</name>
     <description>Which colors has this image? No, I'm serious.</description>
 
